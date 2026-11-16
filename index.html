@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FindIt | ระบบแจ้งของหาย</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Prompt',sans-serif;background:#f4f6fb;color:#1e293b}
+header{background:#fff;padding:18px 7%;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 15px #00000008;position:sticky;top:0;z-index:10}
+.logo{font-size:22px;font-weight:700;color:#2449bb}
+nav a{text-decoration:none;color:#64748b;margin-left:22px;font-size:14px}
+nav a:hover{color:#3156d3}
+.hero{background:linear-gradient(120deg,#172554,#3156d3);padding:75px 20px;text-align:center;color:white}
+.hero h1{font-size:38px;margin-bottom:12px}
+.hero p{color:#dbeafe;font-size:14px;line-height:2}
+.hero button{margin-top:25px;padding:13px 25px;border:0;border-radius:10px;background:white;color:#3156d3;font-weight:600;cursor:pointer}
+.container{max-width:1100px;margin:35px auto;padding:0 20px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:40px}
+.stat{background:white;padding:24px;border-radius:16px;box-shadow:0 5px 20px #00000008}
+.stat p{color:#8490a5;font-size:13px}
+.stat h2{font-size:30px;color:#3156d3;margin-top:8px}
+.heading{margin-bottom:20px}
+.heading h2{font-size:23px}
+.heading p{font-size:13px;color:#8490a5;margin-top:5px}
+.toolbar{display:flex;gap:12px;margin:20px 0;flex-wrap:wrap}
+input,select,textarea{width:100%;padding:13px;border:1px solid #e2e8f0;border-radius:10px;outline:none;font-family:inherit;background:white}
+input:focus,select:focus,textarea:focus{border-color:#3156d3}
+.toolbar input{flex:2;min-width:200px}
+.toolbar select{flex:1;min-width:150px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.item{background:white;border-radius:16px;overflow:hidden;box-shadow:0 5px 20px #00000008;transition:.2s}
+.item:hover{transform:translateY(-4px)}
+.item img{width:100%;height:190px;object-fit:cover;background:#e2e8f0}
+.item-content{padding:18px}
+.item h3{font-size:17px;margin:12px 0}
+.item p{font-size:12px;color:#64748b;line-height:2}
+.tag{display:inline-block;padding:5px 12px;background:#dcfce7;color:#15803d;border-radius:20px;font-size:11px}
+.tag.lost{background:#fef3c7;color:#a16207}
+.tag.done{background:#dbeafe;color:#1d4ed8}
+.item button{margin-top:10px;padding:10px;border:0;border-radius:8px;color:white;width:100%;cursor:pointer;font-family:inherit}
+.done-btn{background:#16a34a}
+.delete-btn{background:#dc2626}
+.delete-btn:hover{background:#b91c1c}
+.contact-btn{background:#3156d3}
+.contact-btn:hover{background:#2449bb}
+.contact-note{font-size:11px;color:#8490a5;margin-top:7px}
+.empty{grid-column:1/-1;background:white;padding:50px;text-align:center;color:#94a3b8;border-radius:15px}
+.form-section{background:white;padding:30px;border-radius:17px;margin-top:50px;box-shadow:0 5px 20px #00000008}
+.form-section h2{margin-bottom:5px}
+.form-section>p{color:#8490a5;font-size:13px;margin-bottom:25px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.field{display:flex;flex-direction:column;gap:8px}
+.field label{font-size:13px;font-weight:500}
+.full{grid-column:1/-1}
+.submit{background:#3156d3;color:white;border:0;padding:15px;border-radius:10px;width:100%;font-size:14px;cursor:pointer;font-family:inherit}
+#preview{display:none;width:150px;height:120px;object-fit:cover;border-radius:10px;margin-top:10px}
+footer{background:#172554;color:white;text-align:center;padding:30px;margin-top:60px}
+footer p{font-size:12px;color:#aab8d5;margin-top:8px}
+@media(max-width:750px){.grid{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:1fr}}
+@media(max-width:500px){header{padding:15px;display:block}nav{margin-top:12px}nav a{margin-right:12px;margin-left:0}.hero h1{font-size:27px}.grid,.form-grid{grid-template-columns:1fr}.full{grid-column:auto}}
+</style>
+</head>
+
+<body>
+<header>
+<div class="logo">🔎 FindIt.</div>
+<nav>
+<a href="#home">หน้าแรก</a>
+<a href="#items">รายการสิ่งของ</a>
+<a href="#report">แจ้งของหาย</a>
+</nav>
+</header>
+
+<section class="hero" id="home">
+<h1>ของหาย ไม่ต้องกังวล ❤️</h1>
+<p>ระบบแจ้งของหายและของที่เก็บได้ภายในวิทยาลัย<br>ช่วยให้ทุกคนสามารถค้นหาและส่งคืนสิ่งของได้ง่ายขึ้น</p>
+<button onclick="goReport()">+ แจ้งรายการสิ่งของ</button>
+</section>
+
+<main class="container">
+<div class="stats">
+<div class="stat"><p>📦 รายการทั้งหมด</p><h2 id="total">0</h2></div>
+<div class="stat"><p>🔍 กำลังตามหา</p><h2 id="lost">0</h2></div>
+<div class="stat"><p>✅ ได้รับคืนแล้ว</p><h2 id="found">0</h2></div>
+</div>
+
+<section id="items">
+<div class="heading">
+<h2>📋 รายการสิ่งของ</h2>
+<p>ค้นหารายการสิ่งของที่หายหรือมีผู้เก็บได้</p>
+</div>
+
+<div class="toolbar">
+<input id="search" placeholder="🔎 ค้นหาสิ่งของ..." oninput="render()">
+<select id="filter" onchange="render()">
+<option value="all">ทุกสถานะ</option>
+<option value="lost">แจ้งของหาย</option>
+<option value="found">เก็บของได้</option>
+<option value="done">ได้รับคืนแล้ว</option>
+</select>
+<select id="category" onchange="render()">
+<option value="all">ทุกหมวดหมู่</option>
+<option>อุปกรณ์การเรียน</option>
+<option>อุปกรณ์อิเล็กทรอนิกส์</option>
+<option>กระเป๋า</option>
+<option>เครื่องแต่งกาย</option>
+<option>อื่น ๆ</option>
+</select>
+</div>
+<div class="grid" id="list"></div>
+</section>
+
+<section class="form-section" id="report">
+<h2>📝 แจ้งรายการสิ่งของ</h2>
+<p>กรอกข้อมูลเพื่อแจ้งของหายหรือแจ้งเก็บของได้</p>
+
+<form id="itemForm">
+<div class="form-grid">
+<div class="field">
+<label>ประเภทการแจ้ง</label>
+<select id="type" required>
+<option value="lost">แจ้งของหาย</option>
+<option value="found">แจ้งเก็บของได้</option>
+</select>
+</div>
+
+<div class="field">
+<label>หมวดหมู่</label>
+<select id="cat" required>
+<option>อุปกรณ์การเรียน</option>
+<option>อุปกรณ์อิเล็กทรอนิกส์</option>
+<option>กระเป๋า</option>
+<option>เครื่องแต่งกาย</option>
+<option>อื่น ๆ</option>
+</select>
+</div>
+
+<div class="field">
+<label>ชื่อสิ่งของ</label>
+<input id="name" placeholder="เช่น กระเป๋าสีดำ" required>
+</div>
+
+<div class="field">
+<label>สถานที่หาย / พบ</label>
+<input id="place" placeholder="เช่น อาคาร 2 ชั้น 3" required>
+</div>
+
+<div class="field">
+<label>ชื่อผู้แจ้ง</label>
+<input id="person" placeholder="ชื่อหรือชื่อเล่น" required>
+</div>
+
+<div class="field">
+<label>ช่องทางติดต่อ</label>
+<input id="contact" placeholder="เบอร์โทร / อีเมล / LINE ID / ลิงก์ Facebook">
+<small class="contact-note">กรุณาระบุช่องทางที่สะดวกให้ติดต่อ และหลีกเลี่ยงการใส่ข้อมูลส่วนตัวที่ไม่จำเป็น</small>
+</div>
+
+<div class="field full">
+<label>รายละเอียดเพิ่มเติม</label>
+<textarea id="detail" rows="3" placeholder="รายละเอียดสิ่งของ..."></textarea>
+</div>
+
+<div class="field full">
+<label>รูปภาพสิ่งของ</label>
+<input type="file" id="photo" accept="image/*">
+<img id="preview" alt="ตัวอย่างรูปภาพ">
+</div>
+
+<div class="full">
+<button type="submit" class="submit">+ ส่งข้อมูลรายการ</button>
+</div>
+</div>
+</form>
+</section>
+</main>
+
+<footer>
+<strong>🔎 FindIt. Lost & Found</strong>
+<p>ระบบแจ้งของหายและของที่เก็บได้ภายในวิทยาลัย</p>
+<p>© 2026 FindIt All Rights Reserved.</p>
+</footer>
+
+<script>
+const KEY="schoolLostFound_v2";
+const placeholder="https://placehold.co/600x400/e2e8f0/64748b?text=No+Image";
+
+let items=[];
+try{
+const stored=localStorage.getItem(KEY);
+if(stored!==null){
+const parsed=JSON.parse(stored);
+if(Array.isArray(parsed))items=parsed;
+}
+}catch(e){items=[]}
+
+let selectedPhoto="";
+
+function save(){
+try{
+localStorage.setItem(KEY,JSON.stringify(items));
+return true;
+}catch(e){
+alert("พื้นที่จัดเก็บเต็ม กรุณาลดขนาดรูปภาพ");
+return false;
+}
+}
+
+function safe(v){
+return String(v??"").replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+}
+
+function goReport(){
+document.getElementById("report").scrollIntoView({behavior:"smooth"});
+}
+
+function render(){
+const keyword=document.getElementById("search").value.toLowerCase();
+const filter=document.getElementById("filter").value;
+const category=document.getElementById("category").value;
+
+const filtered=items.filter(x=>
+(x.name+" "+x.place+" "+x.detail).toLowerCase().includes(keyword)&&
+(filter==="all"||x.status===filter)&&
+(category==="all"||x.cat===category)
+);
+
+document.getElementById("total").textContent=items.length;
+document.getElementById("lost").textContent=items.filter(x=>x.status==="lost").length;
+document.getElementById("found").textContent=items.filter(x=>x.status==="done").length;
+
+const list=document.getElementById("list");
+
+if(!filtered.length){
+list.innerHTML=`
+<div class="empty">
+<div style="font-size:40px">🔎</div>
+<h3 style="margin:12px 0;color:#64748b">ยังไม่มีรายการสิ่งของ</h3>
+<p>สามารถเพิ่มรายการแจ้งของหายหรือเก็บของได้ใหม่ได้เลย</p>
+</div>`;
+return;
+}
+
+list.innerHTML=filtered.map(x=>{
+const statusText={lost:"กำลังตามหา",found:"เก็บของได้",done:"ได้รับคืนแล้ว"};
+
+return `
+<article class="item">
+<img src="${safe(x.photo||placeholder)}" alt="${safe(x.name)}">
+<div class="item-content">
+<span class="tag ${safe(x.status)}">${statusText[x.status]||"ไม่ระบุสถานะ"}</span>
+<h3>${safe(x.name)}</h3>
+<p>📂 ${safe(x.cat)}</p>
+<p>📍 ${safe(x.place)}</p>
+<p>📝 ${safe(x.detail||"ไม่มีรายละเอียด")}</p>
+<p>👤 ${safe(x.person)}</p>
+<p>☎️ ${safe(x.contact||"ไม่ได้ระบุ")}</p>
+
+${x.status!=="done"?`
+<button class="done-btn" onclick="completeItem(${Number(x.id)})">
+✓ ยืนยันว่าได้รับคืนแล้ว
+</button>`:""}
+
+${x.status!=="done" && x.contact ? `
+<button class="contact-btn" onclick="contactItem(${Number(x.id)})">
+✉️ ติดต่อผู้แจ้ง
+</button>` : ""}
+
+<button class="delete-btn" onclick="deleteItem(${Number(x.id)})">
+🗑️ ลบการแจ้ง
+</button>
+</div>
+</article>`;
+}).join("");
+}
+
+function completeItem(id){
+const item=items.find(x=>x.id===id);
+if(!item)return;
+
+if(confirm("ยืนยันว่าได้รับสิ่งของคืนแล้วใช่หรือไม่?")){
+const old=item.status;
+item.status="done";
+if(save()){render()}else{item.status=old}
+}
+}
+
+// ระบบติดต่อผู้แจ้ง
+function contactItem(id){
+const item=items.find(x=>x.id===id);
+if(!item||!item.contact){
+alert("ผู้แจ้งไม่ได้ระบุช่องทางติดต่อ");
+return;
+}
+
+const value=item.contact.trim();
+
+// ลิงก์เว็บไซต์ เช่น Facebook หรือ LINE
+if(/^https?:\/\//i.test(value)){
+window.open(value,"_blank","noopener,noreferrer");
+return;
+}
+
+// อีเมล
+if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)){
+window.location.href="mailto:"+value;
+return;
+}
+
+// เบอร์โทรศัพท์
+const phone=value.replace(/[^\d+]/g,"");
+if(/^\+?\d{8,15}$/.test(phone)){
+window.location.href="tel:"+phone;
+return;
+}
+
+// LINE ID
+if(/^@?[a-zA-Z0-9._-]{3,}$/.test(value)){
+const lineId=value.replace(/^@/,"");
+if(confirm("ช่องทางติดต่อ: "+value+"\nต้องการเปิด LINE เพื่อค้นหาผู้ใช้นี้หรือไม่?")){
+window.open("https://line.me/R/ti/p/~"+encodeURIComponent(lineId),"_blank","noopener,noreferrer");
+}
+return;
+}
+
+// คัดลอกข้อมูลติดต่อ
+if(navigator.clipboard&&window.isSecureContext){
+navigator.clipboard.writeText(value)
+.then(()=>alert("คัดลอกข้อมูลติดต่อแล้ว: "+value))
+.catch(()=>prompt("คัดลอกข้อมูลติดต่อด้านล่าง",value));
+}else{
+prompt("คัดลอกข้อมูลติดต่อด้านล่าง",value);
+}
+}
+
+function deleteItem(id){
+const index=items.findIndex(x=>x.id===id);
+if(index===-1)return;
+
+const item=items[index];
+
+if(confirm("ต้องการลบรายการ '"+item.name+"' ใช่หรือไม่?\n\nเมื่อลบแล้วจะไม่สามารถเรียกคืนได้")){
+const deleted=items.splice(index,1)[0];
+if(save()){
+render();
+alert("ลบรายการเรียบร้อยแล้ว!");
+}else{
+items.splice(index,0,deleted);
+}
+}
+}
+
+document.getElementById("photo").addEventListener("change",function(){
+const file=this.files[0];
+if(!file)return;
+
+if(!file.type.startsWith("image/")){
+alert("กรุณาเลือกไฟล์รูปภาพ");
+this.value="";
+return;
+}
+
+if(file.size>500000){
+alert("กรุณาเลือกรูปภาพไม่เกิน 500 KB");
+this.value="";
+return;
+}
+
+const reader=new FileReader();
+reader.onload=e=>{
+selectedPhoto=e.target.result;
+const preview=document.getElementById("preview");
+preview.src=selectedPhoto;
+preview.style.display="block";
+};
+reader.readAsDataURL(file);
+});
+
+document.getElementById("itemForm").addEventListener("submit",function(e){
+e.preventDefault();
+
+const item={
+id:Date.now(),
+type:document.getElementById("type").value,
+status:document.getElementById("type").value,
+cat:document.getElementById("cat").value,
+name:document.getElementById("name").value.trim(),
+place:document.getElementById("place").value.trim(),
+person:document.getElementById("person").value.trim(),
+contact:document.getElementById("contact").value.trim(),
+detail:document.getElementById("detail").value.trim(),
+photo:selectedPhoto||placeholder
+};
+
+if(!item.name||!item.place||!item.person){
+alert("กรุณากรอกข้อมูลให้ครบ");
+return;
+}
+
+items.unshift(item);
+if(!save()){
+items.shift();
+return;
+}
+
+this.reset();
+selectedPhoto="";
+document.getElementById("preview").style.display="none";
+render();
+alert("ส่งรายการเรียบร้อยแล้ว!");
+document.getElementById("items").scrollIntoView({behavior:"smooth"});
+});
+
+render();
+</script>
+</body>
+</html>
